@@ -1,0 +1,14 @@
+artifact_uri: file:///Users/mikolajandrzejewski/Desktop/itu-sdse-project-sample-/notebooks/mlruns/104684787092406018/936e61f2a23e4310813e5b5ae41fcbc0/artifacts
+end_time: 1764675346577
+entry_point_name: ''
+experiment_id: '104684787092406018'
+lifecycle_stage: active
+run_id: 936e61f2a23e4310813e5b5ae41fcbc0
+run_name: puzzled-moose-741
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764675346070
+status: 3
+tags: []
+user_id: mikolajandrzejewski

@@ -1,0 +1,10 @@
+artifact_location: file:///Users/mikolajandrzejewski/Desktop/itu-sdse-project-sample-/notebooks/mlruns/104684787092406018/models/m-db5e975b46c8402ba2c081e58669f3ff/artifacts
+creation_timestamp: 1764675346658
+experiment_id: '104684787092406018'
+last_updated_timestamp: 1764675349448
+model_id: m-db5e975b46c8402ba2c081e58669f3ff
+model_type: null
+name: model
+source_run_id: 6268308ec5b44bc885900b1396f86630
+status: 2
+status_message: null
