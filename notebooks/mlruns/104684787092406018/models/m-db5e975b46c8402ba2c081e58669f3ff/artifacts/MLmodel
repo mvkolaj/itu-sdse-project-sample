@@ -1,0 +1,19 @@
+artifact_path: file:///Users/mikolajandrzejewski/Desktop/itu-sdse-project-sample-/notebooks/mlruns/104684787092406018/models/m-db5e975b46c8402ba2c081e58669f3ff/artifacts
+flavors:
+  python_function:
+    cloudpickle_version: 3.0.0
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.13.5
+    streamable: false
+mlflow_version: 3.6.0
+model_id: m-db5e975b46c8402ba2c081e58669f3ff
+model_size_bytes: 2077
+model_uuid: m-db5e975b46c8402ba2c081e58669f3ff
+prompts: null
+run_id: 6268308ec5b44bc885900b1396f86630
+utc_time_created: '2025-12-02 11:35:46.667080'

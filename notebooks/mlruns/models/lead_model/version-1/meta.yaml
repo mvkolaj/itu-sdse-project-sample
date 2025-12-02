@@ -1,0 +1,15 @@
+creation_timestamp: 1764675349583
+current_stage: Staging
+deployment_job_state: null
+description: null
+last_updated_timestamp: 1764675349598
+model_id: m-db5e975b46c8402ba2c081e58669f3ff
+name: lead_model
+run_id: 6268308ec5b44bc885900b1396f86630
+run_link: null
+source: models:/m-db5e975b46c8402ba2c081e58669f3ff
+status: READY
+status_message: null
+storage_location: file:///Users/mikolajandrzejewski/Desktop/itu-sdse-project-sample-/notebooks/mlruns/104684787092406018/models/m-db5e975b46c8402ba2c081e58669f3ff/artifacts
+user_id: null
+version: 1
