@@ -26,10 +26,13 @@ func run(ctx context.Context) error {
 	// 2️⃣ Python container running main.py from repo root
 	python := client.Container().
 		From("python:3.10").
+		// mount repo root at /src
 		WithMountedDirectory("/src", client.Host().Directory(".")).
+		// set working directory to /src
 		WithWorkdir("/src").
+		// now this path is correct because cwd is /src
 		WithExec([]string{"python", "-m", "pip", "install", "--upgrade", "pip"}).
-		WithExec([]string{"pip", "install", "-r", "notebooks/requirements.txt"}).
+		WithExec([]string{"pip", "install", "-r", "requirements.txt"}).
 		WithExec([]string{"python", "main.py"})
 
 	// 3️⃣ Sync outputs (artifacts, deployment, model file) back to host
