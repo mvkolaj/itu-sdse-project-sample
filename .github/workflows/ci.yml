@@ -48,6 +48,6 @@ jobs:
           name: model      
 
       - name: Validate model
-        uses: lasselundstenjensen/itu-sdse-project-model-validator@main
+        uses: lasselundstenjensen/itu-sdse-project-model-validator@v1
         with:
           model-path: model   

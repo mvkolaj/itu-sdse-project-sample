@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+	"path/filepath"
 
 	"dagger.io/dagger"
 )
@@ -22,8 +24,13 @@ func run(ctx context.Context) error {
 	}
 	defer client.Close()
 
-	// 🔽 REPLACE this string with your actual repo root from `pwd`
-	hostRepo := client.Host().Directory("/Users/mikolajandrzejewski/Documents/GitHub/itu-sdse-project-sample")
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	repoRoot := filepath.Dir(cwd)
+
+	hostRepo := client.Host().Directory(repoRoot)
 
 	python := client.Container().
 		From("python:3.10").
