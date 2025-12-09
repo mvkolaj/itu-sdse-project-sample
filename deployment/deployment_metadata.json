@@ -2,5 +2,5 @@
     "model_type": "logreg",
     "source_path": "artifacts/lead_model_lr.pkl",
     "deployed_path": "deployment/production_model.pkl",
-    "timestamp": "2025-12-08 15:02:16.059813"
+    "timestamp": "2025-12-09 14:35:10.131274"
 }

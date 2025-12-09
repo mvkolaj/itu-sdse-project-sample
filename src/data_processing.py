@@ -46,7 +46,7 @@ def impute_missing_values(x: pd.Series, method: str = "mean") -> pd.Series:
 # -------------------------------------------------------------------
 
 def run_data_processing(
-    raw_data_path: str = ".data/raw/raw_data.csv",
+    raw_data_path: str = "data/raw/raw_data.csv",
     artifacts_dir: str = "./artifacts",
     min_date: Optional[str] = "2024-01-01",
     max_date: Optional[str] = "2024-01-31",
