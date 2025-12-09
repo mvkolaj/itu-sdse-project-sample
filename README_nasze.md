@@ -18,7 +18,7 @@ The repository is organized as follows:
 
 ---
 
-## How to Run Locally / ## How to Run the Project and Generate the Model Artifact
+## How to Run Locally / How to Run the Project and Generate the Model Artifact
 
 
 ---
