@@ -17,9 +17,7 @@ DATA_GOLD_PATH = ARTIFACTS_DIR / "train_data_gold.csv"
 COLUMNS_LIST_PATH = ARTIFACTS_DIR / "columns_list.json"
 
 
-# ---------------------------------------------------------
-# Helper: one-hot encode categorical columns
-# ---------------------------------------------------------
+
 def create_dummy_cols(df: pd.DataFrame, col: str) -> pd.DataFrame:
     dummies = pd.get_dummies(df[col], prefix=col, drop_first=True)
     new_df = pd.concat([df, dummies], axis=1)
@@ -27,59 +25,38 @@ def create_dummy_cols(df: pd.DataFrame, col: str) -> pd.DataFrame:
     return new_df
 
 
-# ---------------------------------------------------------
-# Step 1: Prepare training data (X_train, X_test, y_train, y_test)
-# ---------------------------------------------------------
 def prepare_training_data(
     data_gold_path: Path = DATA_GOLD_PATH,
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
-    """
-    Load the cleaned gold dataset and prepare features for model training.
-
-    Steps (from your notebook):
-    - Load ./artifacts/train_data_gold.csv
-    - Drop ID/time columns: lead_id, customer_code, date_part
-    - Separate categorical cols: customer_group, onboarding, bin_source, source
-    - One-hot encode categorical columns
-    - Cast all columns to float
-    - Split into X/y with target='lead_indicator'
-    - Train/test split with stratification
-    """
     if not data_gold_path.exists():
         raise FileNotFoundError(f"Gold data not found at {data_gold_path.resolve()}")
 
     data = pd.read_csv(data_gold_path)
     print(f"Training data length: {len(data)}")
 
-    # Drop ID/time columns
     for col in ["lead_id", "customer_code", "date_part"]:
         if col in data.columns:
+
             data = data.drop(columns=[col])
 
-    # Categorical and other variables
     cat_cols = ["customer_group", "onboarding", "bin_source", "source"]
     cat_cols = [c for c in cat_cols if c in data.columns]
 
     cat_vars = data[cat_cols].copy()
     other_vars = data.drop(columns=cat_cols)
 
-    # One-hot encode categorical columns
     for col in cat_vars.columns:
         cat_vars[col] = cat_vars[col].astype("category")
         cat_vars = create_dummy_cols(cat_vars, col)
 
-    # Combine back
     data = pd.concat([other_vars, cat_vars], axis=1)
 
-    # Cast all columns to float64
     for col in data.columns:
         try:
             data[col] = data[col].astype("float64")
-            # print(f"Changed column {col} to float")
         except Exception:
             pass
 
-    # Split into X, y
     if "lead_indicator" not in data.columns:
         raise ValueError(
             "Target column 'lead_indicator' not found in training data. "
@@ -96,15 +73,10 @@ def prepare_training_data(
     return X_train, X_test, y_train, y_test
 
 
-# ---------------------------------------------------------
-# Step 2a: Train XGBoost model (your original train_xgboost)
-# ---------------------------------------------------------
 def train_xgboost(
     X_train: pd.DataFrame, y_train: pd.Series
 ) -> Tuple[XGBRFClassifier, dict]:
-    """
-    Train an XGBRFClassifier with RandomizedSearchCV and save artifacts.
-    """
+    
     ARTIFACTS_DIR.mkdir(exist_ok=True)
 
     model = XGBRFClassifier(random_state=42)
@@ -130,11 +102,9 @@ def train_xgboost(
     grid.fit(X_train, y_train)
     best_model = grid.best_estimator_
 
-    # Save XGBoost native model
     xgb_path = ARTIFACTS_DIR / "lead_model_xgboost.json"
     best_model.save_model(str(xgb_path))
 
-    # Save column names for inference
     with COLUMNS_LIST_PATH.open("w") as f:
         json.dump({"column_names": list(X_train.columns)}, f)
 
@@ -144,16 +114,10 @@ def train_xgboost(
     return best_model, grid.best_params_
 
 
-# ---------------------------------------------------------
-# Step 2b: Train Logistic Regression model (simplified)
-# ---------------------------------------------------------
 def train_logistic_regression(
     X_train: pd.DataFrame, y_train: pd.Series
 ) -> Tuple[LogisticRegression, dict]:
-    """
-    Train a Logistic Regression model with RandomizedSearchCV and save artifacts.
-    This is a simplified version of your mlflow-based training.
-    """
+   
     ARTIFACTS_DIR.mkdir(exist_ok=True)
 
     model = LogisticRegression()
@@ -169,11 +133,9 @@ def train_logistic_regression(
 
     best_model = grid.best_estimator_
 
-    # Save sklearn model
     lr_path = ARTIFACTS_DIR / "lead_model_lr.pkl"
     joblib.dump(best_model, lr_path)
 
-    # Save column names for inference
     with COLUMNS_LIST_PATH.open("w") as f:
         json.dump({"column_names": list(X_train.columns)}, f)
 
@@ -183,23 +145,10 @@ def train_logistic_regression(
     return best_model, grid.best_params_
 
 
-# ---------------------------------------------------------
-# Step 3: Top-level training function for main.py
-# ---------------------------------------------------------
 def run_model_training(
     model_type: Literal["logreg", "xgboost"] = "logreg",
 ) -> Tuple[object, pd.DataFrame, pd.Series]:
-    """
-    Full training step used by main.py:
-
-    1. Prepare training data from train_data_gold.csv
-    2. Train chosen model type
-    3. Return (model, X_test, y_test) for evaluation
-
-    model_type:
-        - 'logreg'  -> Logistic Regression
-        - 'xgboost' -> XGBRFClassifier
-    """
+    
     X_train, X_test, y_train, y_test = prepare_training_data()
 
     if model_type == "xgboost":
