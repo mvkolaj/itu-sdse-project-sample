@@ -7,6 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 import mlflow
+from mlflow.exceptions import MlflowException
 
 # Project paths
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -27,6 +28,21 @@ def pull_data_from_dvc() -> None:
     )
 
 
+def setup_mlflow_experiment(name: str = "data-ingestion") -> None:
+    """
+    Ensure MLflow tracking directory and experiment exist.
+    This is REQUIRED for CI / Go pipelines.
+    """
+    tracking_uri = "file://" + str(PROJECT_ROOT / "mlruns")
+    mlflow.set_tracking_uri(tracking_uri)
+
+    try:
+        mlflow.set_experiment(name)
+    except MlflowException:
+        exp_id = mlflow.create_experiment(name)
+        mlflow.set_experiment(name)
+
+
 def filter_by_date(
     df: pd.DataFrame,
     min_date: datetime.date,
@@ -43,24 +59,32 @@ def filter_by_date(
 def main() -> None:
     ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
 
+    # 🔑 REQUIRED: make MLflow safe for CI / Go
+    setup_mlflow_experiment("data-ingestion")
+
+    # 1. Pull data
     pull_data_from_dvc()
 
     if not RAW_DATA_FILE.exists():
         raise FileNotFoundError("raw_data.csv not found after dvc pull")
 
+    # 2. Load data
     print("Loading raw dataset")
     data = pd.read_csv(RAW_DATA_FILE)
     print(f"Total rows: {len(data)}")
 
+    # 3. Date parameters (deterministic)
     min_date = datetime.date(2024, 1, 1)
     max_date = datetime.date.today()
 
+    # 4. MLflow tracking
     with mlflow.start_run():
         mlflow.log_param("min_date", str(min_date))
         mlflow.log_param("max_date", str(max_date))
 
         filtered = filter_by_date(data, min_date, max_date)
 
+        # Save filtered dataset
         filtered.to_csv(DATE_FILTERED_DATA_FILE, index=False)
         mlflow.log_artifact(DATE_FILTERED_DATA_FILE)
 
