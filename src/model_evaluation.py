@@ -8,12 +8,7 @@ import joblib
 import mlflow
 from mlflow.tracking import MlflowClient
 from mlflow.entities.model_registry.model_version_status import ModelVersionStatus
-from sklearn.metrics import (
-    accuracy_score,
-    confusion_matrix,
-    classification_report,
-)
-from xgboost import XGBRFClassifier
+from sklearn.metrics import classification_report
 
 from paths import (
     X_TEST_FILE,
@@ -31,15 +26,13 @@ def load_test_data() -> Tuple[pd.DataFrame, pd.Series]:
     return X_test, y_test
 
 
-
 def load_logistic_regression():
     return joblib.load(LR_MODEL_FILE)
 
 
 def load_xgboost():
-    model = XGBRFClassifier()
-    model.load_model(str(XGBOOST_MODEL_FILE))
-    return model
+    # ✅ FIX: load exactly how it was saved (joblib)
+    return joblib.load(XGBOOST_MODEL_FILE)
 
 
 def evaluate_predictions(
@@ -63,7 +56,6 @@ def save_columns_and_results(
 
     with open(MODEL_RESULTS_FILE, "w", encoding="utf-8") as f:
         json.dump(model_results, f, indent=2)
-
 
 
 def wait_until_ready(model_name: str, version: int) -> None:
@@ -97,6 +89,7 @@ def register_model(
     wait_until_ready(details.name, details.version)
     return dict(details)
 
+
 def evaluation_pipeline() -> None:
     X_test, y_test = load_test_data()
 
@@ -106,7 +99,6 @@ def evaluation_pipeline() -> None:
     y_pred_lr = lr_model.predict(X_test)
     y_pred_xgb = xgb_model.predict(X_test)
 
-
     lr_report = evaluate_predictions(y_test, y_pred_lr)
     xgb_report = evaluate_predictions(y_test, y_pred_xgb)
 
@@ -115,12 +107,12 @@ def evaluation_pipeline() -> None:
         "xgboost": xgb_report,
     }
 
-  
     save_columns_and_results(X_test, model_results)
 
     print("Evaluation complete.")
     print(f"- {COLUMNS_LIST_FILE}")
     print(f"- {MODEL_RESULTS_FILE}")
+
 
 if __name__ == "__main__":
     evaluation_pipeline()
