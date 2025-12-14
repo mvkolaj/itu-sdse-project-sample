@@ -47,7 +47,7 @@ def train_single_model(
     best = grid.best_estimator_
 
     if isinstance(best, LogisticRegression):
-        mlflow.pyfunc.log_model("model", python_model=lr_wrapper(best))
+        mlflow.pyfunc.log_model("model", python_model=LogisticRegressionAdapter(best))
         joblib.dump(best, model_path)
     else:
         best.save_model(str(model_path))
