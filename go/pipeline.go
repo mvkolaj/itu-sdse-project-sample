@@ -7,18 +7,18 @@ import (
 )
 
 func runStep(name string, command string, args ...string) {
-	fmt.Println("▶ Running:", name)
+	fmt.Println("Running:", name)
 
 	cmd := exec.Command(command, args...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil {
-		fmt.Println("✖ Failed:", name)
+		fmt.Println("Failed:", name)
 		os.Exit(1)
 	}
 
-	fmt.Println("✔ Completed:", name)
+	fmt.Println("Completed:", name)
 }
 
 func main() {
