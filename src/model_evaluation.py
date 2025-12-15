@@ -1,19 +1,15 @@
 import json
-import time
-from typing import Tuple, Optional
+from pathlib import Path
 
 import pandas as pd
-import numpy as np
 import joblib
-import mlflow
-from pathlib import Path
-from mlflow.tracking import MlflowClient
-from mlflow.entities.model_registry.model_version_status import ModelVersionStatus
 from sklearn.metrics import classification_report
+
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
+MODEL_DIR = PROJECT_ROOT / "model"
 
 X_TEST_FILE = ARTIFACTS_DIR / "X_test.csv"
 Y_TEST_FILE = ARTIFACTS_DIR / "y_test.csv"
@@ -40,7 +36,7 @@ def evaluate_predictions(y_true, y_pred):
     return classification_report(y_true, y_pred, output_dict=True)
 
 
-def save_columns_and_results(X, model_results, columns_file, results_file):
+def save_columns_and_results(X, model_results):
     FEATURE_COLUMN_LIST_FILE.parent.mkdir(parents=True, exist_ok=True)
     MODEL_RESULTS_FILE.parent.mkdir(parents=True, exist_ok=True)
 
@@ -51,32 +47,36 @@ def save_columns_and_results(X, model_results, columns_file, results_file):
         json.dump(model_results, f, indent=2)
 
 
-def wait_until_ready(model_name, version, max_retries=10, wait_sec=1):
-    client = MlflowClient()
-    for _ in range(10):
-        details = client.get_model_version(
-            name=model_name,
-            version=version,
-        )
-        status = ModelVersionStatus.from_string(details.status)
-        print(f"Model status: {ModelVersionStatus.to_string(status)}")
-        if status == ModelVersionStatus.READY:
-            return
-        time.sleep(1)
+def select_best_model(model_results: dict) -> str:
+    scores = {
+        model: results["weighted avg"]["f1-score"]
+        for model, results in model_results.items()
+    }
+
+    best_model = max(scores, key=scores.get)
+    print(f"Best model selected: {best_model} (F1={scores[best_model]:.4f})")
+    return best_model
 
 
-def register_model():
-    client = MlflowClient()
-    model_uri = mlflow.get_artifact_uri(
-        artifact_path=artifact_path,
-        run_id=run_id,
-    )
-    details = mlflow.register_model(
-        model_uri=model_uri,
-        name=model_name,
-    )
-    wait_until_ready(details.name, details.version)
-    return dict(details)
+def deploy_model(best_model: str):
+    
+    MODEL_DIR.mkdir(exist_ok=True)
+
+    for f in MODEL_DIR.iterdir():
+        f.unlink()
+
+    if best_model == "logistic_regression":
+        target = MODEL_DIR / "model.pkl"
+        joblib.dump(joblib.load(LOGISTIC_REGRESSION_MODEL_FILE), target)
+
+    elif best_model == "xgboost":
+        target = MODEL_DIR / "model.json"
+        target.write_bytes(XGBOOST_MODEL_FILE.read_bytes())
+
+    else:
+        raise ValueError(f"Unknown model type: {best_model}")
+
+    print(f"Model deployed to: {target.resolve()}")
 
 
 def evaluation_pipeline():
@@ -96,12 +96,12 @@ def evaluation_pipeline():
         "xgboost": xgb_report,
     }
 
-    save_columns_and_results(X_test, model_results, FEATURE_COLUMN_LIST_FILE, MODEL_RESULTS_FILE)
+    save_columns_and_results(X_test, model_results)
 
+    best_model = select_best_model(model_results)
+    deploy_model(best_model)
 
-    print("Evaluation complete.")
-    print(f"- {FEATURE_COLUMN_LIST_FILE}")
-    print(f"- {MODEL_RESULTS_FILE}")
+    print("Evaluation and deployment completed successfully.")
 
 
 if __name__ == "__main__":
