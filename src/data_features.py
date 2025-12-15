@@ -188,7 +188,7 @@ def run_feature_engineering(df):
     return final
 
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     mlflow.set_experiment("data_features")
     with mlflow.start_run(run_name="feature_engineering_run"):
         raw = pd.read_csv(FILTERED_BY_DATE_FILE)
