@@ -1,4 +1,4 @@
-name: MLOps Pipeline (Go + Dagger)
+name: MLOps Pipeline 
 
 on:
   push:
