@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from sklearn.preprocessing import MinMaxScaler
+import mlflow
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -31,10 +32,10 @@ def _numeric_summary(series):
         index=["Count", "Missing", "Mean", "Min", "Max"],
     )
 
-
-def clean_base_data(df):
+def clean_base_data(df, allowed_sources=None):
     df = df.copy()
-    df = df.drop(columns=[
+
+    cols_to_drop = [
         "is_active",
         "marketing_consent",
         "first_booking",
@@ -44,15 +45,19 @@ def clean_base_data(df):
         "country",
         "visited_learn_more_before_booking",
         "visited_faq",
-    ])
+    ]
+    df = df.drop(columns=cols_to_drop, errors="ignore")
 
-    cols = ["lead_indicator", "lead_id", "customer_code"]
-    df[cols] = df[cols].replace("", np.nan)
+    key_cols = ["lead_indicator", "lead_id", "customer_code"]
+    df[key_cols] = df[key_cols].replace("", np.nan)
 
     df = df.dropna(subset=["lead_indicator", "lead_id"])
-    df = df[df.source == "signup"]
-    return df
 
+    if allowed_sources is None:
+        allowed_sources = ["signup"]
+    df = df[df.source.isin(allowed_sources)]
+
+    return df
 
 def split_feature_types(df):
     df = df.copy()
@@ -83,6 +88,8 @@ def cap_outliers(continuous, n_std=2):
     capped.apply(_numeric_summary).T.to_csv(
         OUTLIER_SUMMARY_FILE, index=False
     )
+
+    mlflow.log_artifact(OUTLIER_SUMMARY_FILE)
     return capped
 
 def impute_series(series, numeric_strategy="mean"):
@@ -103,6 +110,8 @@ def impute_features(categorical, continuous):
         CATEGORICAL_IMPUTATION_FILE, index=False
     )
 
+    mlflow.log_artifact(CATEGORICAL_IMPUTATION_FILE)
+
     continuous = continuous.apply(impute_series)
 
     categorical["customer_code"] = (
@@ -119,6 +128,7 @@ def scale_continuous_features(continuous):
     scaler = MinMaxScaler()
     scaler.fit(continuous)
     joblib.dump(scaler, FEATURE_SCALER_FILE)
+    mlflow.log_artifact(FEATURE_SCALER_FILE)
 
     return pd.DataFrame(
         scaler.transform(continuous),
@@ -140,8 +150,11 @@ def combine_and_record_columns(categorical, continuous):
 
     with open(FEATURE_COLUMNS_FILE, "w") as f:
         json.dump(list(data.columns), f)
+    mlflow.log_artifact(FEATURE_COLUMNS_FILE)
 
     data.to_csv(MODEL_TRAINING_DATA_FILE, index=False)
+    mlflow.log_artifact(MODEL_TRAINING_DATA_FILE)
+
     return data
 
 
@@ -170,9 +183,13 @@ def run_feature_engineering(df):
     final = bin_source_feature(combined)
 
     final.to_csv(TRAINING_GOLD_DATA_FILE, index=False)
+    mlflow.log_artifact(TRAINING_GOLD_DATA_FILE)
+
     return final
 
 
-if __name__ == "__main__":
-    raw = pd.read_csv(FILTERED_BY_DATE_FILE)
-    run_feature_engineering(raw)
+if _name_ == "_main_":
+    mlflow.set_experiment("data_features")
+    with mlflow.start_run(run_name="feature_engineering_run"):
+        raw = pd.read_csv(FILTERED_BY_DATE_FILE)
+        run_feature_engineering(raw)
