@@ -13,26 +13,39 @@ The original notebook has been refactored into **Python scripts**, and the pipel
 
 ## Repository Structure
 The repository is organized as follows:
+.
+├── README.md                <- Project overview and usage instructions
+├── requirements.txt         <- Python dependencies
+├── go
+│   ├── pipeline.go          <- Dagger-based pipeline 
+│   └── go.mod               <- Go module definition
+│
+├── data
+│   └── raw_data.csv.dvc     <-DVC metadata file tracking the raw dataset stored in a remote data source
+│
+├── notebooks                <- Exploratory notebooks and experiments
+│
+├── docs                     <- Architecture diagrams and documentation assets
+│
+└── src                      <- Core Python source code
+    ├── __init__.py
+    ├── data_preprocessing.py <- Data loading and preprocessing
+    ├── data_features.py      <- Feature engineering
+    ├── model_training.py     <- Model training and hyperparameter tuning
+    └── model_evaluation.py   <- Model evaluation and metrics
 
 
 
 ---
-
 ## How to Run Locally / How to Run the Project and Generate the Model Artifact
 
 
----
-
-## Running the Dagger Workflow Locally
-
 
 ---
-
 ## Using GitHub Actions Workflow
 
 
 ---
-
 ## Notes 
 
 

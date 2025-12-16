@@ -12,8 +12,6 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
 DATA_DIR = PROJECT_ROOT / "data"
 
-DATA_DIR = PROJECT_ROOT / "data"
-ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
 RAW_DATA_FILE = DATA_DIR / "raw_data.csv"
 FILTERED_BY_DATE_FILE = ARTIFACTS_DIR / "data_filtered_by_date.csv"
 DATE_FILTER_METADATA_FILE = ARTIFACTS_DIR / "date_filter_metadata.json"
