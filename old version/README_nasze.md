@@ -14,30 +14,36 @@ The original notebook has been refactored into **Python scripts**, and the pipel
 ## Repository Structure
 The repository is organized as follows:
 .
-├── README.md                <- Project overview and usage instructions
-├── requirements.txt         <- Python dependencies
-├── go
-│   ├── pipeline.go          <- Dagger-based pipeline 
-│   └── go.mod               <- Go module definition
+├── .dvc/                                       # DVC internal files
+├── .github/workflows/
+│   └── test_action.yml                         # GitHub Actions CI workflow
 │
-├── data
-│   └── raw_data.csv.dvc     <-DVC metadata file tracking the raw dataset stored in a remote data source
+├── data/
+│   └── raw_data.csv.dvc                        # DVC pointer to raw dataset
 │
-├── notebooks                <- Exploratory notebooks and experiments
+├── docs/                                       # Architecture diagrams and documentation assets
 │
-├── docs                     <- Architecture diagrams and documentation assets
+├── go/
+│   ├── pipeline.go                             # Dagger-based pipeline 
+│   └── go.mod                                  # Go module definition
 │
-└── src                      <- Core Python source code
-    ├── __init__.py
-    ├── data_preprocessing.py <- Data loading and preprocessing
-    ├── data_features.py      <- Feature engineering
-    ├── model_training.py     <- Model training and hyperparameter tuning
-    └── model_evaluation.py   <- Model evaluation and metrics
+├── notebooks/                                  # Exploratory notebooks and experiments
+│
+├── src/                                        # Core Python source code
+│   ├── __init__.py
+│   ├── data_preprocessing.py                   # Data loading and preprocessing
+│   ├── data_features.py                        # Feature engineering
+│   ├── model_training.py                       # Model training
+│   └── model_evaluation_and_deployment.py      # Evaluation, model selection and deployment
+│
+├── README.md                                   # Project documentation
+├── requirements.txt                            # Python dependencies
+
 
 
 
 ---
-## How to Run Locally / How to Run the Project and Generate the Model Artifact
+## How to Run Locally 
 
 
 
