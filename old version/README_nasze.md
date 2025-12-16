@@ -45,7 +45,7 @@ The repository is organized as follows:
 
 ## How To Run the Project
 
-### Using GitHub Actions Workflow
+### 1. Using GitHub Actions Workflow
 
 The project can be executed entirely through GitHub Actions directly from GitHub, which automates the full MLOps pipeline.
 
@@ -69,7 +69,7 @@ After a successful run, the workflow automatically uploads:
 - **model/**: The final deployed model artifact (named model).
 
 
-### Locally 
+### 2. Locally 
 Make sure the following tools are installed on your machine:
 
 **Docker Desktop:** Must be installed and running (required by Dagger).
