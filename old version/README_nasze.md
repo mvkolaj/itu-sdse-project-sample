@@ -45,7 +45,36 @@ The repository is organized as follows:
 
 
 ---
-## How to Run Locally 
+
+## How To Run the Project
+
+### Using GitHub Actions Workflow
+
+The project can be executed entirely through GitHub Actions directly from GitHub, which automates the full MLOps pipeline.
+
+Prerequisites
+
+A public GitHub repository containing the project.
+
+**Manual Trigger**
+- Go to the repository **Actions** tab.
+- Select the workflow named **"GitHub Actions Workflow"**.
+- Click **Run workflow** and select a main branch to execute.
+- Click **Run workflow**. 
+
+The workflow will:
+1. Checkout the repository and install dependencies.
+2. Run the Dagger pipeline (go/pipeline.go).
+3. Upload artifacts for download. 
+
+After a successful run, the workflow automatically uploads:
+- **training-artifacts/**: Intermediate artifacts.
+- **model/**: The final deployed model artifact (named model).
+
+
+### Locally 
+
+The pipeline is designed to run automatically through GitHub Actions, but it can also be executed locally.
 
 Prerequisites
 
@@ -70,10 +99,10 @@ This command will:
 1. Start the Dagger engine
 2. Pull the dataset using DVC
 3. Run the following pipeline stages:
--Data preprocessing
--Feature engineering
--Model trainin
--Model evaluation and deployment
+- Data preprocessing
+- Feature engineering
+- Model training
+- Model evaluation and deployment
 4. Save all generated outputs to the local filesystem
 
 **4. Verify the Output** 
@@ -81,13 +110,6 @@ After a successful run, the following directories will be created:
 * **`mlruns/`:** Contains the local MLflow Tracking data and the Model Registry.
 * **`artifacts/`:** Contains the final generated files, including `train_data_gold.csv`, and `model_results.json` etc.
 * **`model/`:** Contains the final deployed model artifact, named `model.json`
----
-## Using GitHub Actions Workflow
-
-
----
-## Notes 
-
 
 ---
 
