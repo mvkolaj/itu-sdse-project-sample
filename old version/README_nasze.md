@@ -41,11 +41,6 @@ The repository is organized as follows:
 ├── README.md                                   <- Project documentation
 ├── requirements.txt                            <- Python dependencies
 ```
-
-<<<<<<< HEAD
-
-
-
 ---
 
 ## How To Run the Project
@@ -75,14 +70,6 @@ After a successful run, the workflow automatically uploads:
 
 
 ### Locally 
-
-The pipeline is designed to run automatically through GitHub Actions, but it can also be executed locally.
-
-Prerequisites
-
-=======
-## How to Run Locally 
->>>>>>> 58288a9b65cd18e7d8a5017317d947f1a879d4c3
 Make sure the following tools are installed on your machine:
 
 **Docker Desktop:** Must be installed and running (required by Dagger).
@@ -113,8 +100,8 @@ This command will:
 **4. Verify the Output** 
 After a successful run, the following directories will be created:
 * **`mlruns/`:** Contains the local MLflow Tracking data and the Model Registry.
-* **`artifacts/`:** Contains the final generated files, including `train_data_gold.csv`, and `model_results.json` etc.
-* **`model/`:** Contains the final deployed model artifact, named `model.json`
+* **`artifacts/`:** Contains the final generated files, including `training_data_gold.csv`, and `model_results.json` etc.
+* **`model/`:** Contains the final deployed model artifact, named `model.pkl`
 
 ---
 
